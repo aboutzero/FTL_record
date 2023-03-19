@@ -77,7 +77,20 @@ LUN: Logic Unit Number
     }Indexnode_t;
 
     typedef FtlErr_t (*FeNodeProc)(FeReqNode_t *Node); // typedef声明了一种返回值是FtlErr_t 类型、函数参数是FeReqNode_t* 类型的函数指针类型 FeNodeProc
+    typedef struct _LogicUnit_t
+    {
+        u8 LuId;
+        u8 LuFlags;
+        U16 IoBlockFlags;
+        U32 Capacity; // 容量
+        U32 sn;
+        BlkQueue_t BlkQueue;
+        GcReq_t gcReq;
+        SysLogDesc_t Sld;
+        SldFlush_t SldFlush;
 
+        LogicUnitMethod_t intf; // 方法函数
+    }LogicUnit_t;
 
 ```
 
@@ -184,3 +197,9 @@ FTL_DisPatchCacheReq()作为FTL中的IO流程中的最前端接口，承接FE封
 
 根据结点的opcode(option code)对结点ReqNode进行func并返回结果Ret
 func <==> FtlWriteCmdProc | FtlReadCmdProc | FtlTrimCmdProc | FtlAdminCmdProc | NULL
+
+## Questions
+
+`PHL_PollingTMReq(16);`是什么？
+
+IO Block Flags 有些什么值？
