@@ -27,7 +27,7 @@ simulation任务在一个while(1)当中，当且晋档超时`timeUpFlag == TRUE`
 
 ## Write流程
 
-进入TaskSchedule() -> 进入TasksHandleList通过遍历g_taskIndexHeadArry链表找到gTaskMngArry，然后遍历进入gTaskMngArry中的函数(包含UFS_TasksFsmInit中初始化的全部Process)中去。`gTaskMngArry[index].handler();`
+进入TaskSchedule()->进入TasksHandleList通过遍历g_taskIndexHeadArry链表找到gTaskMngArry，然后遍历进入gTaskMngArry中的函数(包含UFS_TasksFsmInit中初始化的全部Process)中去。`gTaskMngArry[index].handler();`
 
 遍历顺序如下：
 
@@ -73,7 +73,7 @@ g_FeWriteReqQueue首先被取出指向CurQueue
 进入`FtlWriteCmdProc`(FTL Write Commond Process)中，
 将ReqNode传入`FtlSubmitCacheWrite`
 
-进入`FtlSubmitCacheWrite`后立即通过`LuGet`(USER_LU_ID == 0)返回`g_LogicUnits(USER_LU_ID)`([LogicUnit_t](#logicunit_t))的地址，并以此创建一个`*UserLu`([UserLu_t](#userlu_t))指向该片地址。
+进入`FtlSubmitCacheWrite`后立即通过`LuGet(USER_LU_ID)`返回`g_LogicUnits(USER_LU_ID)`([LogicUnit_t](#logicunit_t))的地址，并以此创建一个`*UserLu`([UserLu_t](#userlu_t))指向该片地址。
 
 然后，再创建一个`*CurCtx(CurWrCtx_t)`指向`UserLu->CurWrCtx`。
 
@@ -129,7 +129,7 @@ sys_assert判断并置其上下文ForceFlag为TRUE
 
 ---
 
-进入UserWriteCtxSubmitReq后首先进行了一次容器转换`ContainerOf(...)`
+进入UserWriteCtxSubmitReq后首先进行了一次容器转换`ContainerOf(...)`返回当前fsm的ctx
 
 然后创建一个*Node指针指向当前ctx的FeNode
 
@@ -148,21 +148,15 @@ Opcode=FTL_OP_WRITE
 
 进入`FtlSubmit(FtlReq)`返回`g_LogicUnits`的submit返回值
 
-即将该LU(UserLu)和FtlReq(write)传入其LogicUnitMethod(为submit)
+即将该LU(UserLu)和FtlReq(write)传入其LogicUnitMethod(为submit方法：submit a IO to logical space)
 
-在该LU和Write op下的submit指向 `UserLuSubmit` 即要求`UserLuSubmit`的返回值
+在该LU和Write op下的submit方法指向 `UserLuSubmit` 即要求`UserLuSubmit`的返回值
 
 同样地，要求其返回值
 
-则根据LU(UserLu)和FtlReq(Write) 所以进入了`g_UserSubmitOpHandlers`的method数组中
+则根据LU(UserLu)和FtlReq(Write) 所以进入了`g_UserSubmitOpHandlers`(包含Read Write Trim Flush Gc 5种方法)的Write中
 
-传入后，进入[`UserWrite()`流程](UserWrite.md)
-
-* `UserWrite()`流程
-
----
-
-
+传入后，进入[`UserWrite`流程](#userwrite-流程)
 
 * 返回`FTL_DisPatchCacheReq`
 
@@ -177,6 +171,131 @@ Opcode=FTL_OP_WRITE
 其他则根据ReqId将当前的队列`Queue_Dequeue`
 
 ### FTL_DisPatchNandReqDone 流程
+
+### UserWrite 流程
+
+进入Userwrite
+
+立即将LU的地址转换成`UserLu_t* user`进行解析，其中传入的pReq为FtlReq_t。创建`FtlIO_Ctx_t *hostCtx`(Ftl主机的IO上下文)，设置User页分配类型为`USER_HOST_PAGE_ALLOC`，创建`reqCnt = req->u8ReqCnt`(req计数变量)，创建`duCnts`(DU计数变量：通过reqCnt进行转换)，创建Page_ordered，设置user的PageALoc方法，创建`RlutLu_t *ru`，进入Step 1。
+
+* Step 1
+
+---
+
+进行LuMakeDirty判断，如果LuMakeDirtyDone则`LuFlags &= ~LU_F_CLEAN`即LuMakeDirty返回真，跳出第一个Step 1进入Step 2。
+
+`FtlReq->nandReq == NULL`则`FtlGetNandReq`
+
+执行过`FtlGetNandReq`后`FtlReq->nandReq == NULL`仍成立，则`NandReqPendLu`挂起(Nand LU) 并返回FTL_ERR_OK
+
+如果FtlReq是Req Gc
+则返回`UserGcWrite`
+
+* Step 2
+
+---
+
+判：
+如果Logical Space缺乏可用资源(LU 的IO Blocked Flags != 0)，则置Flags为FTL_REQ_F_BLKING且pend并插入ftl req queue返回FTL_ERR_OK。
+
+然后通过`FtlGetIoCtxById`(g_ftlHostCtxs)返回给主机上下文变量(hostCtx)。
+
+判：
+g_powerLoss(掉电标志)假且`FC_Check`假
+则`LuIoBlkBy`且goto `pend`
+
+pend:
+
+置Flags为FTL_REQ_F_BLKING且pend并插入ftl req queue返回FTL_ERR_OK。
+
+* Step 3
+
+---
+
+将user中的rlutLu提出来放入ru
+
+判：
+RlutEntryReserve返回假，则`LuIoBlkBy`(LU_IO_BLK_F_RLUT)且goto `got_return`
+
+* Step 4
+
+---
+
+返回`PageAllocatorOrder`给page_ordered
+
+判：
+page_ordered为零，则`LuIoBlkBy`(LU_IO_BLK_F_PAGE)并`RlutRetun`(ru->u16Validcnt += duCnts)
+
+gotoreturn:
+
+若PageAllocatorFull返回真(page分配器已满)则`UserConverTrigger`(启动User Convert)并goto`pend`。
+
+将主机上下文(hostCtx)、req、pga、ru、reqCnt传入[`UserWriteCtxSubmit`](#userwritectxsubmit-流程)
+
+### UserWriteCtxSubmit 流程
+
+创建一系列局部变量
+通过`LuGet`使用req的LU id返回user(UserLu_t *)，创建iter(LrangeEnum_t)，创建attr(CmdAttr_t)...
+
+如果req的id小于MAX_FTL_REQ(正常io)：
+    将传入的ctx(hostCtx)转换作为(FtlIO_Ctx_t*)解析
+    为一系列的局部变量赋值(meta、dataBuffer、status、Paa)
+
+根据host_ctx中的status和PgaStatus_t的大小(Aspb等于两个spb：在物理上两个spb共享一个channel)获取页
+
+将`PageAllocatorGet`返回给AllocCnt(分配页计数)
+
+* PageAllocatorGet
+
+---
+
+首先通过`PgaAssignPaa`获取计数值(get_cnt)
+
+根据get_cnt和skip_page进入，
+    根据page status的(cnt+skip)不等于0和slot是否等于当前slot进行判断，若真，重新计算一下index和SlotId
+
+然后给page status的cnt、skip、slot参数赋值，index增加。
+
+
+
+
+* PgaAssignPaa
+
+---
+
+创建aspb指针指向当前(`PgaGetCurActiveSpb`)Active的spb和其他一些变量
+
+根据aspb指向的spb id和pda的索引通过`nal_make_pda`返回一个pda(physical d address)
+
+循环：(从当前在页内的写指针小于其页最大数量的情况下)
+
+````txt
+    将LPaa `TransPaa`到WPaaOff(Details在函数`TranslatePaa`中)
+    判断是否是DefectPage 若是则跳过该页
+
+    根据get_cnt进行一些条件判断
+
+    根据WPaaOff
+    获取Die id(`nal_pda_to_tgt`)
+    获取当前页的index
+    设置PageCnt
+    LPaa 加上一个DU_Page大小4
+    aspb的write ptr和Occupy计数增加
+    get_cnt也增加
+````
+
+循环结束后进行一些值的改变，退出PgaAssignPaa。
+
+---
+
+从PageAllocatorGet出来后，根据aspb当前Slot的mode进行配置attr的slcmode、cahcemode参数
+
+然后进行setup_meta(设置meta数据)
+
+进行LbaRangeEnumInit(初始化 配置iter的参数)
+
+进入循环：(循环MAX_ASPB_PER_PGA 两次)
+
 
 ## 数据类型
 

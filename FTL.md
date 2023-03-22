@@ -36,17 +36,17 @@ LUN: Logic Unit Number
 
     typedef struct _FeReqWrite_t
     {
-        U08 u08Lun; // Logic Unit Number 逻辑单元号
+        U08 u08Lun; // Logic Unit
         U32 u32Fua; // Force Unit Access
-        U08 u08Rev; // Receive
+        U08 u08Rev; // Reserve // 保留
         IDXList_t SubReqList;
         U08 *pu08DataBuffer;
     }FeReqWrite_t;
     
     typedef struct _FeReqReadNode
     {
-        U08 u08Lun; // Logic Unit Number 逻辑单元号
-        U08 u08Rev[2]; // Receive
+        U08 u08Lun; // 等于LS logic space/unit
+        U08 u08Rev[2]; // Reserve // 保留
         U32 u32Lba; // Logic Block Address
         U32 u32SectCnt; // Sector Count
         U08 *pu08DataBuffer;
@@ -54,8 +54,8 @@ LUN: Logic Unit Number
     
     typedef struct _FeReqAdmin_t
     {
-        U08 u08Lun; // Logic Unit Number 逻辑单元号
-        U08 u08Rev; // ? Receive
+        U08 u08Lun;
+        U08 u08Rev; // ? Reserve // 保留
         U32 u32Lba; // Logic Block Address
         U32 u32SectCnt; // Sector Count
         U32 u32Rev0;
@@ -77,6 +77,7 @@ LUN: Logic Unit Number
     }Indexnode_t;
 
     typedef FtlErr_t (*FeNodeProc)(FeReqNode_t *Node); // typedef声明了一种返回值是FtlErr_t 类型、函数参数是FeReqNode_t* 类型的函数指针类型 FeNodeProc
+
     typedef struct _LogicUnit_t
     {
         u8 LuId;

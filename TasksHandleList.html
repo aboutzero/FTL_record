@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TasksHandleList.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="taskshandlelist">TasksHandleList</h1>
+<h2 id="%E8%BF%9B%E5%85%A5simulation">进入Simulation</h2>
+<p>TaskHandleList初始化在main.cpp中通过TimerStart()之后，在<code>UFS_TasksFsmInit(gUTTaskMngArry);</code>中<code>xxxFsmInit();</code>初始化了一系列的FSM(状态机)、<code>UFS_TaskMngInit();</code>初始化了<code>gTaskMngArry</code>，数组中包含一些列的FsmProcess和TimerSchedule。</p>
+<p>之后便是一些相关API和Boot启动。</p>
+<p>而后，通过windows创建一个主机线程GetInfo(...)
+在GetInfo中，CaseCnt计数主机任务数量。通过CaseRegister(...)建立对应的Host任务</p>
+<ul>
+<li>在本例流程中，建立了一个IO_HOST_WRITE Sequence用于追踪。</li>
+</ul>
+<p>当进入整个simulation任务流程前，将SLOTDOWN置1。</p>
+<p>simulation任务在一个while(1)当中，当且晋档超时<code>timeUpFlag == TRUE</code>跳出simulation任务(此时是否已经完成simulation? 从当前的调试情况来看，确实是这样。当simulation完成后才会有timeUpFlag=TRUE的情况)</p>
+<h2 id="simulation%E6%B5%81%E7%A8%8B">Simulation流程</h2>
+<p>在第一个while(1)中，需<code>SLOTDOWN == 0</code>才可以退出。当且仅当HostProcess发送IO后，SLOTDOWN才会置0退出。</p>
+<p>然后进入第一个for(...)中，进行一些Que LBA 等等的配置。紧接着while(1)进入TaskSchedule调度等待其运行完成。</p>
+<p>然后进入第二个for(...)，同样进行一些Que之类的配置。</p>
+<p>之后进入while(1)，进入Write流程的调度之中。</p>
+<h2 id="write%E6%B5%81%E7%A8%8B">Write流程</h2>
+<p>进入TaskSchedule()-&gt;进入TasksHandleList通过遍历g_taskIndexHeadArry链表找到gTaskMngArry，然后遍历进入gTaskMngArry中的函数(包含UFS_TasksFsmInit中初始化的全部Process)中去。<code>gTaskMngArry[index].handler();</code></p>
+<p>遍历顺序如下：</p>
+<ol>
+<li>TimerSchedule</li>
+<li>GetNewCmdProcess</li>
+<li>Write_FsmProcess</li>
+<li>Cache_FsmProcess</li>
+<li>WriteResp_FsmProcess</li>
+<li>ReadFsmProcess</li>
+<li>ReadRespFsmProcess</li>
+<li>RPMBFsmProcess</li>
+<li>ReqFsmProcess</li>
+<li>FFlushFsmProcess</li>
+<li>BeNormalTaskProccess</li>
+<li>BeBgTaskProcess</li>
+<li>BeAdminTaskProcess</li>
+<li>EvtTaskProcess</li>
+<li><a href="#ftl_dispatchcachereq-%E6%B5%81%E7%A8%8B">FTL_DisPatchCacheReq</a></li>
+<li><a href="#ftl_dispatchnandreqdone-%E6%B5%81%E7%A8%8B">FTL_DisPatchNandReqDone</a></li>
+</ol>
+<hr>
+<h3 id="ftldispatchcachereq-%E6%B5%81%E7%A8%8B">FTL_DisPatchCacheReq 流程</h3>
+<p>FTL_DisPatchCacheReq将会处理三种类型的队列，包括：g_FeAdminReqQueue, g_FeReadReqQueue, g_FeWriteReqQueue。此三种队列均从FE端进行打包。</p>
+<ul>
+<li>处理Write流程</li>
+</ul>
+<hr>
+<p>g_FeWriteReqQueue首先被取出指向CurQueue</p>
+<p>判空<code>OS_Queue_IsEmpty</code>
+若空则进行下一轮处理队列的流程</p>
+<p>非空，
+则进入whlie(队列非空)流程处理中：</p>
+<p>首先，
+使用Queue_PeekHead获取ReqId并由此从g_FeReqArry中取出Request Node(结点)放入ReqNode</p>
+<p>然后，
+进入<code>FtlWriteCmdProc</code>(FTL Write Commond Process)中，
+将ReqNode传入<code>FtlSubmitCacheWrite</code></p>
+<p>进入<code>FtlSubmitCacheWrite</code>后立即通过<code>LuGet(USER_LU_ID)</code>返回<code>g_LogicUnits(USER_LU_ID)</code>(<a href="#logicunit_t">LogicUnit_t</a>)的地址，并以此创建一个<code>*UserLu</code>(<a href="#userlu_t">UserLu_t</a>)指向该片地址。</p>
+<p>然后，再创建一个<code>*CurCtx(CurWrCtx_t)</code>指向<code>UserLu-&gt;CurWrCtx</code>。</p>
+<p>此时，创建了一个地址指针UserLu指向地址指针数组g_LogicUnits[0]的地址。</p>
+<p>如果FtlBoot没有启动成功，
+则
+返回<code>FTL_ERR_PENDING</code>的state退出当前流程。</p>
+<p>如果UserLu中存在有FeNode即<code>CurCtx-&gt;FeNode != NULL</code>且该Node等于当前传入FeNode
+则
+sys_assert
+否则
+令其指向当前传入的FeReqNode然后处理当前FeReqNode</p>
+<p>判当前指向FeNode是否为空
+sys_assert判断并置其上下文ForceFlag为TRUE</p>
+<p>置上下文ErrCode为FTL_ERR_OK</p>
+<p>进入<code>FsmCtxRun</code></p>
+<ul>
+<li>处理<code>_fsm_ctx_run</code>流程</li>
+</ul>
+<hr>
+<p>根据Fe_DisPatchCacheReq传来的ctx中，将进行<code>UserWriteCtxCheck</code></p>
+<p>从ctx中找到并进入(相应的处理函数，这里是)UserWriteCtxCheck并返回其值<code>fsmres</code></p>
+<p>根据处理结果返回值fsmres
+进行FSM的状态切换</p>
+<ul>
+<li>处理<code>UserWriteCtxCheck</code></li>
+</ul>
+<hr>
+<p>进入UserWriteCtxCheck后首先进行了一次容器转换<code>ContainerOf(...)</code></p>
+<p>然后创建一个局部*user指针指向UserLu，也就是g_LogicUnits这片地址。</p>
+<p>返回一个IO是否Blocked的标志给<code>Blockflags</code></p>
+<p>当且仅当未堵塞、USER_LU_F_HOST_PAUSE未发生、User当前Aspb没有被强制结束</p>
+<p>则
+返回 FSM_CONT 状态机正常进行计数</p>
+<p>否则
+返回 FSM_QUIT 状态机放弃当前任务，同时UserLu的上下文应置为FTL_ERR_PENDING(挂起)</p>
+<ul>
+<li>通过<code>_fsm_ctx_run</code>进入<code>UserWriteCtxSubmitReq</code></li>
+</ul>
+<hr>
+<p>进入UserWriteCtxSubmitReq后首先进行了一次容器转换<code>ContainerOf(...)</code>返回当前fsm的ctx</p>
+<p>然后创建一个*Node指针指向当前ctx的FeNode</p>
+<p>创建一个局部变量<code>*FtlReq</code>指针指向当前ctx的req</p>
+<p>当FeNode的Req类型是Write时：</p>
+<p>使用<code>SglGetSize(&amp;CurCCtx-&gt;req-&gt;sgl)</code>计算Datasize</p>
+<p>如果DataSize大于UserDu的空间
+则
+置Flags FTL_REQ_F_SGL 需求SGL
+Opcode=FTL_OP_WRITE</p>
+<p>通过<code>FtlReqSetup</code>和赋值 设置<code>FtlReq</code></p>
+<p>进入<code>FtlSubmit(FtlReq)</code>返回<code>g_LogicUnits</code>的submit返回值</p>
+<p>即将该LU(UserLu)和FtlReq(write)传入其LogicUnitMethod(为submit方法：submit a IO to logical space)</p>
+<p>在该LU和Write op下的submit方法指向 <code>UserLuSubmit</code> 即要求<code>UserLuSubmit</code>的返回值</p>
+<p>同样地，要求其返回值</p>
+<p>则根据LU(UserLu)和FtlReq(Write) 所以进入了<code>g_UserSubmitOpHandlers</code>(包含Read Write Trim Flush Gc 5种方法)的Write中</p>
+<p>传入后，进入<a href="#userwrite-%E6%B5%81%E7%A8%8B"><code>UserWrite</code>流程</a></p>
+<ul>
+<li>返回<code>FTL_DisPatchCacheReq</code></li>
+</ul>
+<hr>
+<p>对g_FeNodeOp进行对应操作之后，根据返回值</p>
+<p>如果出现OOM或者Blocked则return</p>
+<p>如果出现挂起 则break</p>
+<p>其他则根据ReqId将当前的队列<code>Queue_Dequeue</code></p>
+<h3 id="ftldispatchnandreqdone-%E6%B5%81%E7%A8%8B">FTL_DisPatchNandReqDone 流程</h3>
+<h3 id="userwrite-%E6%B5%81%E7%A8%8B">UserWrite 流程</h3>
+<p>进入Userwrite</p>
+<p>立即将LU的地址转换成<code>UserLu_t* user</code>进行解析，其中传入的pReq为FtlReq_t。创建<code>FtlIO_Ctx_t *hostCtx</code>(Ftl主机的IO上下文)，设置User页分配类型为<code>USER_HOST_PAGE_ALLOC</code>，创建<code>reqCnt = req-&gt;u8ReqCnt</code>(req计数变量)，创建<code>duCnts</code>(DU计数变量：通过reqCnt进行转换)，创建Page_ordered，设置user的PageALoc方法，创建<code>RlutLu_t *ru</code>，进入Step 1。</p>
+<ul>
+<li>Step 1</li>
+</ul>
+<hr>
+<p>进行LuMakeDirty判断，如果LuMakeDirtyDone则<code>LuFlags &amp;= ~LU_F_CLEAN</code>即LuMakeDirty返回真，跳出第一个Step 1进入Step 2。</p>
+<p><code>FtlReq-&gt;nandReq == NULL</code>则<code>FtlGetNandReq</code></p>
+<p>执行过<code>FtlGetNandReq</code>后<code>FtlReq-&gt;nandReq == NULL</code>仍成立，则<code>NandReqPendLu</code>挂起(Nand LU) 并返回FTL_ERR_OK</p>
+<p>如果FtlReq是Req Gc
+则返回<code>UserGcWrite</code></p>
+<ul>
+<li>Step 2</li>
+</ul>
+<hr>
+<p>判：
+如果Logical Space缺乏可用资源(LU 的IO Blocked Flags != 0)，则置Flags为FTL_REQ_F_BLKING且pend并插入ftl req queue返回FTL_ERR_OK。</p>
+<p>然后通过<code>FtlGetIoCtxById</code>(g_ftlHostCtxs)返回给主机上下文变量(hostCtx)。</p>
+<p>判：
+g_powerLoss(掉电标志)假且<code>FC_Check</code>假
+则<code>LuIoBlkBy</code>且goto <code>pend</code></p>
+<p>pend:</p>
+<p>置Flags为FTL_REQ_F_BLKING且pend并插入ftl req queue返回FTL_ERR_OK。</p>
+<ul>
+<li>Step 3</li>
+</ul>
+<hr>
+<p>将user中的rlutLu提出来放入ru</p>
+<p>判：
+RlutEntryReserve返回假，则<code>LuIoBlkBy</code>(LU_IO_BLK_F_RLUT)且goto <code>got_return</code></p>
+<ul>
+<li>Step 4</li>
+</ul>
+<hr>
+<p>返回<code>PageAllocatorOrder</code>给page_ordered</p>
+<p>判：
+page_ordered为零，则<code>LuIoBlkBy</code>(LU_IO_BLK_F_PAGE)并<code>RlutRetun</code>(ru-&gt;u16Validcnt += duCnts)</p>
+<p>gotoreturn:</p>
+<p>若PageAllocatorFull返回真(page分配器已满)则<code>UserConverTrigger</code>(启动User Convert)并goto<code>pend</code>。</p>
+<p>将主机上下文(hostCtx)、req、pga、ru、reqCnt传入<a href="#userwritectxsubmit-%E6%B5%81%E7%A8%8B"><code>UserWriteCtxSubmit</code></a></p>
+<h3 id="userwritectxsubmit-%E6%B5%81%E7%A8%8B">UserWriteCtxSubmit 流程</h3>
+<p>创建一系列局部变量
+通过<code>LuGet</code>使用req的LU id返回user(UserLu_t *)，创建iter(LrangeEnum_t)，创建attr(CmdAttr_t)...</p>
+<p>如果req的id小于MAX_FTL_REQ(正常io)：
+将传入的ctx(hostCtx)转换作为(FtlIO_Ctx_t*)解析
+为一系列的局部变量赋值(meta、dataBuffer、status、Paa)</p>
+<p>根据host_ctx中的status和PgaStatus_t的大小(Aspb等于两个spb：在物理上两个spb共享一个channel)获取页</p>
+<p>将<code>PageAllocatorGet</code>返回给AllocCnt(分配页计数)</p>
+<ul>
+<li>PageAllocatorGet</li>
+</ul>
+<hr>
+<p>首先通过<code>PgaAssignPaa</code>获取计数值(get_cnt)</p>
+<ul>
+<li>PgaAssignPaa</li>
+</ul>
+<hr>
+<p>创建aspb指针指向当前(<code>PgaGetCurActiveSpb</code>)Active的spb和其他一些变量</p>
+<p>根据aspb指向的spb id和pda的索引通过<code>nal_make_pda</code>返回一个pda(physical d address)</p>
+<p>循环：(从当前在页内的写指针小于其页最大数量的情况下)
+判断是否是</p>
+<h2 id="%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">数据类型</h2>
+<h3 id="logicunitt">LogicUnit_t</h3>
+<pre class="hljs"><code><div>    <span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">LogicUnit_t</span>
+    {</span>
+        U8 LuId;
+        U8 LuFlags;
+        U16 IoBlockFlags;
+        U32 Capacity; <span class="hljs-comment">// 容量</span>
+        U32 sn;
+        BlkQueue_t BlkQueue;
+        GcReq_t gcReq;
+        SysLogDesc_t Sld;
+        SldFlush_t SldFlush;
+
+        LogicUnitMethod_t intf; <span class="hljs-comment">// 方法函数</span>
+    }LogicUnit_t;
+</div></code></pre>
+<h3 id="userlut">UserLu_t</h3>
+<pre class="hljs"><code><div>    <span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">UserLu_t</span>
+    {</span>
+        LogicUnit_t Lu;
+        U32 Flags;
+        PageAllocate_t PageAlloc[USER_MAX_PAGE_ALLOC]; <span class="hljs-comment">// 包含PageAllocate方法函数</span>
+        SpbAppl_t SpbAppl[USER_MAX_PAGE_ALLOC]; <span class="hljs-comment">// 包含VerifyFunc NotifyFunc AllocFunc三种方法函数</span>
+        U32 u32ReadTraining;
+        
+        L2ppRa_t l2ppRa;
+
+        CurWrCtx_t CurWrCtx;
+        AdminCmdCtx_t AdminCtx;
+
+        Lut_t lut;
+        RlutLu_t rlutLu[USER_MAX_PAGE_ALLOC];
+
+        ConvertReq_t creq;
+        Wait_t *GcCvrtSync;
+        AspbInfo_t AspbInfo[USER_MAX_PAGE_ALLOC][MAX_ASPB_PER_PGA];
+
+        FC_t fc; <span class="hljs-comment">// flow control</span>
+    }UserLu_t;
+</div></code></pre>
+<p>_SrbMgrVirginInit</p>
+<p>Write_GetNewCmd</p>
+<p>Cache_GetCache</p>
+<p>WriteResp_GetResp</p>
+<p>ReadGetNewCmd</p>
+<p>Resp_GetResp</p>
+<p>RPMBGetNewCmd</p>
+<p>Req_GetNew</p>
+<p>FFlush_GetNew</p>
+
+</body>
+</html>

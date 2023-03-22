@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="tqvnxjW7iA2RWQLMnOYQ" name="第 1 页">
-        <mxGraphModel dx="1767" dy="720" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+        <mxGraphModel dx="2047" dy="792" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -757,17 +757,6 @@
                 </mxCell>
                 <mxCell id="330" value="ctz&lt;br&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="3200" y="770" width="70" height="30" as="geometry"/>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
-    <diagram id="WvwA085zk-rXrhoLoD9e" name="第 2 页">
-        <mxGraphModel dx="751" dy="932" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
-                <mxCell id="jwINZK51-hva34NpSXEz-1" value="FTL_DisPatchCacheReq" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;glass=0;shadow=0;" vertex="1" parent="1">
-                    <mxGeometry x="280" y="70" width="160" height="60" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

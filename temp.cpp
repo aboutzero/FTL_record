@@ -1,5 +1,6 @@
 #include <iostream>
 
+
 struct temp
 {
     int a;
