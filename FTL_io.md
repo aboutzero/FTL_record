@@ -10,13 +10,87 @@ FTL层通过`FTL_DisPatchCacheReq`处理FeReqNode。
 
 ## FeDisPatchCacheReq
 
-解析[ReqNode](#fereqnode)
+`FeDisPatchCacheReq`结构设计思路。
 
-FE根据ReqNode的类型是挂在三种[`Queue`](#queue_t) `Admin Read Write`
+Q: 要求解决Fe处理过后的FeReqNode信息。需要将其command拆解，获取具体执行的IO操作。在解析过后，要求找到对应的nand区域，想后端发送对应的FtlReq。
 
-`FeDisPatchCacheReq`就是从三种队列上取出ReqNode
+A: 找到FeReqNode之间的联系与区别FtlReq。比较不同和关联，找到相应的联系，然后找到对应的函数去考虑数据的变化，然后，找到对应的函数实现，最后考虑其数据变化过程的调度关系，关心函数的非正常情况。
 
 ### FeReqNode
+
+FeReqNode是[FeReqNode_t](#fereqnode_t)数据类型。
+
+FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给三种不同ReqType来进行内存的分配。
+
+- ReqId 作为其FeReqNode的标识，通过ReqId可以从FE和FTL共同访问的g_FeReqArry指针中去找到与ReqId所对应的FeReqNode。
+
+- ReqType 是作为FeReqNode的操作请求类型标识的变量，可以被赋予三个值分别对应三种操作请求标识。
+
+- union 中的内容有三种操作请求[FeReqWrite](#fereqwrite_t)、[FeReqRead](#fereqread_t)、[FeReqAdmin](#fereqadmin_t)。
+
+在这样的structure设计中，由于三种操作共用一片内存，所以，在解析FeReqNode请求对nand进行什么操作的时候，必须要先进行ReqType的判断，然后才能将这片共用内存以正确的结构形式进行解析。
+
+
+
+## 数据类型
+
+### FeReqNode_t
+
+```cpp
+    typedef struct _FeReqNode_t
+    {
+        U08 u08ReqId; // Request ID
+        U08 u08ReqType; // Request Type
+        union
+        {
+            /* 三种IO命令格式 */
+            FeReqWrite_t FeReqWriteNode; // w
+            FeReqRead_t FeReqReadNode; // r
+            FeReqAdmin_t FeReqAdminNode; // Manage
+        }
+    }FeReqNode_t;
+```
+
+### FeReqWrite_t
+
+```cpp
+    typedef struct _FeReqWrite_t
+    {
+        U08 u08Lun; // Logic Unit
+        U32 u32Fua; // Force Unit Access
+        U08 u08Rev; // Reserve // 保留
+        IDXList_t SubReqList;
+        U08 *pu08DataBuffer;
+    } FeReqWrite_t;
+```
+
+### FeReqRead_t
+
+```cpp
+    typedef struct _FeReqRead_t
+    {
+        U08 u08Lun; // 等于LS logic space/unit
+        U08 u08Rev[2]; // Reserve // 保留
+        U32 u32Lba; // Logic Block Address
+        U32 u32SectCnt; // Sector Count
+        U08 *pu08DataBuffer;
+    } FeReqRead_t;
+```
+
+### FeReqAdmin_t
+
+```cpp
+    typedef struct _FeReqAdmin_t
+    {
+        U08 u08Lun;
+        U08 u08Rev; // ? Reserve // 保留
+        U32 u32Lba; // Logic Block Address
+        U32 u32SectCnt; // Sector Count
+        U32 u32Rev0;
+        U32 u32Rev1;
+    } FeReqAdmin_t;
+
+```
 
 ### Queue_t
 
@@ -83,17 +157,18 @@ FE根据ReqNode的类型是挂在三种[`Queue`](#queue_t) `Admin Read Write`
 
 ```txt
 LBA: logic block address
+PBA: physic block address
 LUN: logic unit
 LAA: 
-LDA: 
+LDA: 定义同LBA
 PAA: 
-PDA: 
+PDA: 定义同PBA
 spb: super block
 LU: 
 PU: 
 ELU: 
 l2pp: logic to physic
-op: Option
+op: Operation
 Fsm: finite state machine 状态机
 flush: 刷新
 sldFlush: 
