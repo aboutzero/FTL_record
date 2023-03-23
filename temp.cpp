@@ -16,6 +16,7 @@ void func(void)
     std::cout << "this" << std::endl;
 };
 
+
 int main()
 {
     temp A[3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};

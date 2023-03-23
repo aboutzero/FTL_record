@@ -5,7 +5,7 @@
 ---
 
 FUA: Force Unit Access
-    强制数据直接写入flash
+    直接写入nand标识
 
 写入数据会进入缓冲后返回写入完成。而此时数据并未进入flash，所以通过FUA指令可以跳过缓存直接写入flash，但会牺牲性能。这是由于Host必须等待数据写入flash后才能进行操作。
 
