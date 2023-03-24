@@ -26,11 +26,21 @@ FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给�
 
 - ReqType 是作为FeReqNode的操作请求类型标识的变量，可以被赋予三个值分别对应三种操作请求标识。
 
-- union 中的内容有三种操作请求[FeReqWrite](#fereqwrite_t)、[FeReqRead](#fereqread_t)、[FeReqAdmin](#fereqadmin_t)。
+- union 中的内容有三种操作请求[FeReqWrite](#fereqwrite)、[FeReqRead](#fereqread)、[FeReqAdmin](#fereqadmin)。
 
 在这样的structure设计中，由于三种操作共用一片内存，所以，在解析FeReqNode请求对nand进行什么操作的时候，必须要先进行ReqType的判断，然后才能将这片共用内存以正确的结构形式进行解析。
 
+### FeReqWrite
 
+FeReqWrite是[FeReqWrite_t](#fereqwrite_t)类型。
+
+### FeReqRead
+
+FeReqRead是[fereqread_t](#fereqread_t)类型。
+
+### FeReqAdmin
+
+FeReqAdmin是[fereqadmin_t](#fereqadmin_t)类型。
 
 ## 数据类型
 
@@ -56,7 +66,7 @@ FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给�
 ```cpp
     typedef struct _FeReqWrite_t
     {
-        U08 u08Lun; // Logic Unit
+        U08 u08Lun; // Logic Unit Number
         U32 u32Fua; // Force Unit Access
         U08 u08Rev; // Reserve // 保留
         IDXList_t SubReqList;
@@ -69,11 +79,14 @@ FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给�
 ```cpp
     typedef struct _FeReqRead_t
     {
-        U08 u08Lun; // 等于LS logic space/unit
-        U08 u08Rev[2]; // Reserve // 保留
-        U32 u32Lba; // Logic Block Address
-        U32 u32SectCnt; // Sector Count
-        U08 *pu08DataBuffer;
+        U08 u08Lun; //
+        U08 u08Rev[2]; // Reserve
+        U08 u08IsHPB; // 
+        U32 u32Lba; // logic block address
+        U32 u32paa[8]; // 在一个read req中最多有8个 paa
+        U08 u08PaaCnt; // req中paa的数量
+        U32 u32SectCnt; // sector的数量 每个sector是4k
+        U08 *pu08DataBuffer; // physical unit的data buffer地址
     } FeReqRead_t;
 ```
 
@@ -82,8 +95,8 @@ FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给�
 ```cpp
     typedef struct _FeReqAdmin_t
     {
-        U08 u08Lun;
-        U08 u08Rev; // ? Reserve // 保留
+        U08 u08Lun; // logic uinit number
+        U08 u08Rev; // reserve word section
         U32 u32Lba; // Logic Block Address
         U32 u32SectCnt; // Sector Count
         U32 u32Rev0;
@@ -155,22 +168,29 @@ FeReqNode包含自己的ReqId、ReqType、以及一个union(共用体)用于给�
     } EluMng_t;
 ```
 
-```txt
-LBA: logic block address
-PBA: physic block address
-LUN: logic unit
-LAA: 
-LDA: 定义同LBA
-PAA: 
-PDA: 定义同PBA
-spb: super block
-LU: 
-PU: 
-ELU: 
-l2pp: logic to physic
-op: Operation
-Fsm: finite state machine 状态机
-flush: 刷新
-sldFlush: 
-Cli: 表示client 来自client的请求
-```
+## Question Record
+
+abbreviation        |         defination
+---                 |         ---
+LBA                 |         logic block address
+PBA                 |         physic block address
+LUN                 |         logic unit number
+LAA                 |
+LDA                 |         logic data address
+PAA                 |
+PDA                 |         physic data address
+spb                 |         super block
+LU                  |         logical unit
+PU                  |         physical unit
+ELU                 |
+FFU                 |         field firmware update
+l2pp                |         logic to physic
+op                  |         Operation
+Fsm                 |         finite state machine 状态机
+flush               |         刷新
+sldFlush            |
+Cli                 |         表示client 来自client的请求
+FUA                 |         force unit access 强迫写入(此标记意味着必须写入nand)
+lrange              |
+
+每个sector是4k，sector指向的是什么的地址？
